@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "build:website": "vite build --config website/vite.config.ts",
     "preview": "vite preview",
-    "preview:website": "vite preview --config website/vite.config.ts"
+    "preview:website": "build": "tsc -p tsconfig.json && vite build"
   },
   "dependencies": {
     "react": "^18.3.1",
