@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:website": "vite --config website/vite.config.ts",
-    "build": "tsc && vite build",
+    "build": "tsc -p tsconfig.json && vite build",
     "build:website": "vite build --config website/vite.config.ts",
     "preview": "vite preview",
     "preview:website": "vite preview --config website/vite.config.ts"
