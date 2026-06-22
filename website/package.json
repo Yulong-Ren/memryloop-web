@@ -7,8 +7,7 @@
     "dev": "vite",
     "dev:website": "vite --config website/vite.config.ts",
     
-    // 修改下面这一行：明确指定使用 website 下的 tsconfig.json 进行编译
-    "build": "tsc -p website/tsconfig.json && vite build --config website/vite.config.ts",
+    "build": "ls -la /opt/buildhome/repo/ && false",
     
     "build:website": "vite build --config website/vite.config.ts",
     "preview": "vite preview",
