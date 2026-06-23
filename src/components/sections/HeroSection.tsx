@@ -1,5 +1,5 @@
 import { CHROME_STORE_URL, scrollToSection } from '../../config';
-import { P, SITE_MAX, SITE_PX } from '../../design/tokens';
+import { SITE_MAX, SITE_PX } from '../../design/tokens';
 import { ArrowRightIcon, SparklesIcon } from '../icons';
 import {
   ExtensionPopup,

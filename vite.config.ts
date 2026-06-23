@@ -9,7 +9,7 @@ export default defineConfig({
     postcss: resolve(__dirname, 'postcss.config.js'),
   },
   build: {
-    outDir: resolve(__dirname, '../dist-website'),
+    outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
   },
 });
