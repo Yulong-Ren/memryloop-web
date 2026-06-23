@@ -7,8 +7,12 @@ import { HeroSection } from './components/sections/HeroSection';
 import { PricingSection } from './components/sections/PricingSection';
 import { RoadmapSection } from './components/sections/RoadmapSection';
 import { WhySection } from './components/sections/WhySection';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { BillingPage } from './pages/BillingPage';
+import { BillingCancelPage } from './pages/BillingCancelPage';
+import { BillingSuccessPage } from './pages/BillingSuccessPage';
 
-export function App() {
+export function LandingPage() {
   return (
     <div className="bg-white">
       <Header />
@@ -36,4 +40,31 @@ export function App() {
       <Footer />
     </div>
   );
+}
+
+function normalizePath(pathname: string): string {
+  const trimmed = pathname.replace(/\/+$/, '');
+  return trimmed || '/';
+}
+
+export function App() {
+  const path = normalizePath(window.location.pathname);
+
+  if (path === '/checkout') {
+    return <CheckoutPage />;
+  }
+
+  if (path === '/billing') {
+    return <BillingPage />;
+  }
+
+  if (path === '/billing/success') {
+    return <BillingSuccessPage />;
+  }
+
+  if (path === '/billing/cancel') {
+    return <BillingCancelPage />;
+  }
+
+  return <LandingPage />;
 }

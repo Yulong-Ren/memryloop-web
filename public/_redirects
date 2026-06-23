@@ -1,0 +1,3 @@
+/checkout     /index.html   200
+/billing      /index.html   200
+/billing/*    /index.html   200
