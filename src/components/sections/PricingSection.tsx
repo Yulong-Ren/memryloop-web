@@ -1,11 +1,11 @@
-import { CHROME_STORE_URL } from '../../config';
+import { BILLING_ROUTES } from '../../config/billing';
 import { P, SHADOW_MD, SHADOW_SM, SITE_MAX, SITE_PX } from '../../design/tokens';
 import { CheckIcon } from '../icons';
 import { Btn, SectionLabel } from '../ui';
 
-const FREE_BENEFITS = ['10 AI Notes per day', 'Save 30 videos', 'Basic translation', 'Chrome & Firefox'];
+const FREE_BENEFITS = ['5 AI Notes per day', 'Save up to 10 videos', 'Basic translation', 'Chrome & Firefox'];
 const PRO_BENEFITS = [
-  '100 AI Notes per day',
+  '50 AI Notes per day',
   'Unlimited library',
   'Priority AI processing',
   'Early access to future features',
@@ -84,9 +84,12 @@ export function PricingSection() {
                 </li>
               ))}
             </ul>
-            <Btn href={CHROME_STORE_URL} className="w-full justify-center py-3">
+            <Btn href={BILLING_ROUTES.billing} className="w-full justify-center py-3">
               Upgrade to Pro
             </Btn>
+            <p className="mt-3 text-center text-[12px] leading-relaxed text-[#6e6e73]">
+              Continue in the MemryLoop extension to link your account and pay with PayPal.
+            </p>
           </div>
         </div>
       </div>

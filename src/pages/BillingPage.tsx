@@ -14,7 +14,7 @@ const TABLE_ROWS = [
 ];
 
 const PRO_FEATURES = [
-  'Generate up to 100 AI Notes every day',
+  'Generate up to 50 AI Notes every day',
   'Save unlimited notes and vocabulary',
   'Faster AI note generation',
   'Early access to new features',
