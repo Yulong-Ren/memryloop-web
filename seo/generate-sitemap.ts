@@ -47,7 +47,7 @@ export function generateRobotsTxt(): string {
   return [`User-agent: *`, `Allow: /`, ``, `Sitemap: ${SITE_ORIGIN}/sitemap.xml`, ''].join('\n');
 }
 
-/** Cloudflare Pages: emit route shells so /billing and /privacy resolve to real HTML files. */
+/** Cloudflare Pages: emit `<route>.html` shells so /billing and /privacy resolve without trailing slashes. */
 export function writeSpaRouteShells(outDir: string): void {
   const resolvedOutDir = resolve(outDir);
   const indexPath = resolve(resolvedOutDir, 'index.html');
@@ -60,18 +60,10 @@ export function writeSpaRouteShells(outDir: string): void {
     }
 
     const relativePath = route.path.replace(/^\//, '');
-    const routeDir = resolve(resolvedOutDir, relativePath);
-    mkdirSync(routeDir, { recursive: true });
-    copyFileSync(indexPath, resolve(routeDir, 'index.html'));
+    const htmlPath = resolve(resolvedOutDir, `${relativePath}.html`);
+    mkdirSync(dirname(htmlPath), { recursive: true });
+    copyFileSync(indexPath, htmlPath);
   }
-}
-
-function writeTrailingSlashRedirects(outDir: string): void {
-  const lines = SITE_ROUTES.filter((route) => route.path !== '/').map(
-    (route) => `${route.path}  ${route.path}/  308`,
-  );
-
-  writeFileSync(resolve(outDir, '_redirects'), `${lines.join('\n')}\n`, 'utf8');
 }
 
 export function writeSeoArtifacts(outDir: string, lastModified: Date = new Date()): void {
@@ -81,7 +73,6 @@ export function writeSeoArtifacts(outDir: string, lastModified: Date = new Date(
   writeFileSync(resolve(resolvedOutDir, 'sitemap.xml'), generateSitemapXml(lastModified), 'utf8');
   writeFileSync(resolve(resolvedOutDir, 'robots.txt'), generateRobotsTxt(), 'utf8');
   writeSpaRouteShells(resolvedOutDir);
-  writeTrailingSlashRedirects(resolvedOutDir);
 }
 
 const isDirectExecution =
