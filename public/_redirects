@@ -1,5 +1,1 @@
-/checkout          /index.html   200
-/billing           /index.html   200
-/billing/success   /index.html   200
-/billing/cancel    /index.html   200
-/privacy           /index.html   200
+/*    /index.html   200
