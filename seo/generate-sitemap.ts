@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,12 +47,20 @@ export function generateRobotsTxt(): string {
   return [`User-agent: *`, `Allow: /`, ``, `Sitemap: ${SITE_ORIGIN}/sitemap.xml`, ''].join('\n');
 }
 
+/** Cloudflare Pages SPA: copy index.html → 404.html so /billing, /privacy keep their URL. */
+export function writeSpaFallback(outDir: string): void {
+  const resolvedOutDir = resolve(outDir);
+  const indexPath = resolve(resolvedOutDir, 'index.html');
+  copyFileSync(indexPath, resolve(resolvedOutDir, '404.html'));
+}
+
 export function writeSeoArtifacts(outDir: string, lastModified: Date = new Date()): void {
   const resolvedOutDir = resolve(outDir);
   mkdirSync(resolvedOutDir, { recursive: true });
 
   writeFileSync(resolve(resolvedOutDir, 'sitemap.xml'), generateSitemapXml(lastModified), 'utf8');
   writeFileSync(resolve(resolvedOutDir, 'robots.txt'), generateRobotsTxt(), 'utf8');
+  writeSpaFallback(resolvedOutDir);
 }
 
 const isDirectExecution =

@@ -4,7 +4,7 @@
  * When adding a new marketing/legal page:
  * 1. Add an entry here with `includeInSitemap: true`
  * 2. Register the route in `src/App.tsx`
- * 3. Add a `_redirects` rule in `public/_redirects` if it is a client-side route
+ * 3. Cloudflare Pages serves unknown paths via build output `404.html` (copy of index.html)
  */
 export const SITE_ORIGIN = 'https://memryloop.com';
 
