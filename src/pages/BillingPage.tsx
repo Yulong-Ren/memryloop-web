@@ -1,40 +1,61 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Footer } from '../components/Footer';
 import { CheckIcon, ChevronDownIcon, ShieldIcon, SparklesIcon } from '../components/icons';
 import { Btn } from '../components/ui';
 import { P, SHADOW_MD, SITE_MAX, SITE_PX } from '../design/tokens';
-import { startPayPalCheckout } from '../services/billing';
+import { fetchBillingConfig, startPayPalCheckout } from '../services/billing';
+import type { PlanLimits } from '../types/billing';
 
-const TABLE_ROWS = [
-  { feature: 'AI Notes per day', free: '10', pro: '100' },
-  { feature: 'Library Storage', free: '30 items', pro: 'Unlimited' },
-  { feature: 'AI Processing', free: 'Standard', pro: 'Priority' },
-  { feature: 'Export', free: null, pro: 'PDF & Markdown' },
-  { feature: 'Future Features', free: null, pro: 'Early Access' },
-];
+const DEFAULT_LIMITS: PlanLimits = {
+  freeDailyAnalyzeLimit: 5,
+  proDailyAnalyzeLimit: 50,
+  freeLibraryLimit: 10,
+};
 
-const PRO_FEATURES = [
-  'Generate up to 50 AI Notes every day',
-  'Save unlimited notes and vocabulary',
-  'Faster AI note generation',
-  'Early access to new features',
-  'PDF & Markdown export',
-];
+function buildCompareRows(limits: PlanLimits) {
+  return [
+    {
+      feature: 'AI Notes per day',
+      free: String(limits.freeDailyAnalyzeLimit),
+      pro: String(limits.proDailyAnalyzeLimit),
+    },
+    {
+      feature: 'Library Storage',
+      free: `${limits.freeLibraryLimit} items`,
+      pro: 'Unlimited',
+    },
+    { feature: 'AI Processing', free: 'Standard', pro: 'Priority' },
+    { feature: 'Export', free: null, pro: 'PDF & Markdown' },
+    { feature: 'Future Features', free: null, pro: 'Early Access' },
+  ];
+}
 
-const FAQS = [
-  {
-    q: 'Can I cancel anytime?',
-    a: 'Yes. You can cancel your subscription at any time from the MemryLoop extension settings. Your Pro access continues until the end of the billing period.',
-  },
-  {
-    q: 'What happens if I reach my AI Note limit?',
-    a: 'On the Free plan, note generation pauses until the next day. Upgrade to Pro for 100 notes per day and significantly more headroom for active learners.',
-  },
-  {
-    q: 'Which payment methods are supported?',
-    a: 'Currently, PayPal is supported for all subscriptions. Additional payment methods may be added in the future.',
-  },
-];
+function buildDefaultProFeatures(limits: PlanLimits) {
+  return [
+    `Generate up to ${limits.proDailyAnalyzeLimit} AI Notes every day`,
+    'Save unlimited notes and vocabulary',
+    'Faster AI note generation',
+    'Early access to new features',
+    'PDF & Markdown export',
+  ];
+}
+
+function buildFaqs(limits: PlanLimits) {
+  return [
+    {
+      q: 'Can I cancel anytime?',
+      a: 'Yes. You can cancel your subscription at any time from the MemryLoop extension settings. Your Pro access continues until the end of the billing period.',
+    },
+    {
+      q: 'What happens if I reach my AI Note limit?',
+      a: `On the Free plan, note generation pauses until the next day. Upgrade to Pro for ${limits.proDailyAnalyzeLimit} notes per day and significantly more headroom for active learners.`,
+    },
+    {
+      q: 'Which payment methods are supported?',
+      a: 'Currently, PayPal is supported for all subscriptions. Additional payment methods may be added in the future.',
+    },
+  ];
+}
 
 function readUserIdFromQuery(): string | null {
   const params = new URLSearchParams(window.location.search);
@@ -78,6 +99,30 @@ export function BillingPage() {
   const userId = readUserIdFromQuery();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [limits, setLimits] = useState<PlanLimits>(DEFAULT_LIMITS);
+  const [proFeatures, setProFeatures] = useState<string[]>(() => buildDefaultProFeatures(DEFAULT_LIMITS));
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchBillingConfig(controller.signal)
+      .then(({ limits: nextLimits, proFeatures: nextProFeatures }) => {
+        setLimits(nextLimits);
+        if (nextProFeatures.length > 0) {
+          setProFeatures(nextProFeatures);
+        } else {
+          setProFeatures(buildDefaultProFeatures(nextLimits));
+        }
+      })
+      .catch(() => {
+        // Keep fallback defaults when the API is unreachable.
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const tableRows = useMemo(() => buildCompareRows(limits), [limits]);
+  const faqs = useMemo(() => buildFaqs(limits), [limits]);
 
   async function handleUpgrade() {
     if (!userId) return;
@@ -129,13 +174,13 @@ export function BillingPage() {
                 </span>
               </div>
 
-              {TABLE_ROWS.map((row, index) => (
+              {tableRows.map((row, index) => (
                 <div
                   key={row.feature}
                   className="grid grid-cols-3 items-center px-6 py-4"
                   style={{
                     borderBottom:
-                      index < TABLE_ROWS.length - 1 ? '1px solid rgba(0,0,0,0.08)' : undefined,
+                      index < tableRows.length - 1 ? '1px solid rgba(0,0,0,0.08)' : undefined,
                   }}
                 >
                   <span className="text-sm font-medium text-[#0a0a0a]">{row.feature}</span>
@@ -187,7 +232,7 @@ export function BillingPage() {
               <p className="mb-6 text-sm text-[#6e6e73]">Learn faster. Remember more.</p>
 
               <ul className="mb-8 space-y-3.5">
-                {PRO_FEATURES.map((feature) => (
+                {proFeatures.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <span
                       className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
@@ -263,7 +308,7 @@ export function BillingPage() {
           Frequently Asked Questions
         </h2>
         <div className="rounded-2xl border border-[rgba(0,0,0,0.08)] px-6">
-          {FAQS.map((faq) => (
+          {faqs.map((faq) => (
             <FAQItem key={faq.q} q={faq.q} a={faq.a} />
           ))}
         </div>

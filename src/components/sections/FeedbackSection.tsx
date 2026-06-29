@@ -20,18 +20,18 @@ export function FeedbackSection() {
 
           <div className="mb-10 flex items-center justify-center gap-3">
             <a
-              href="mailto:hello@memryloop.com"
+              href="mailto:support@memryloop.com"
               className="text-[14px] font-medium text-[#6e6e73] no-underline transition-colors hover:text-[#0a0a0a]"
             >
-              hello@memryloop.com
+              support@memryloop.com
             </a>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Btn size="lg" href="mailto:hello@memryloop.com">
+              <Btn size="lg" href="mailto:support@memryloop.com">
               Send Feedback
             </Btn>
-            <Btn size="lg" variant="outline" href="mailto:hello@memryloop.com">
+            <Btn size="lg" variant="outline" href="mailto:support@memryloop.com">
               Join Community
             </Btn>
           </div>

@@ -4,6 +4,29 @@ export interface CreateSubscriptionResult {
   message: string | null;
 }
 
+export interface PlanLimits {
+  freeDailyAnalyzeLimit: number;
+  proDailyAnalyzeLimit: number;
+  freeLibraryLimit: number;
+}
+
+export interface BillingPlan {
+  id: string;
+  name: string;
+  price: string;
+  currency: string;
+  interval: string;
+  features: string[];
+}
+
+export interface BillingConfig {
+  billingEnabled: boolean;
+  checkoutEnabled: boolean;
+  websiteUrl: string;
+  limits: PlanLimits;
+  plans: BillingPlan[];
+}
+
 export type PlanTier = 'free' | 'pro';
 
 export type SubscriptionStatus =

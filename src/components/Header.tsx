@@ -1,4 +1,10 @@
-import { CHROME_STORE_URL, NAV_ITEMS, scrollToSection } from '../config';
+import {
+  buildSectionHref,
+  CHROME_STORE_URL,
+  isLandingPath,
+  NAV_ITEMS,
+  navigateToSection,
+} from '../config';
 import { P, SITE_MAX, SITE_PX } from '../design/tokens';
 import { SparklesIcon } from './icons';
 import { Btn } from './ui';
@@ -7,7 +13,15 @@ export function Header() {
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
     if (href.startsWith('#')) {
       e.preventDefault();
-      scrollToSection(href.slice(1));
+      navigateToSection(href);
+    }
+  }
+
+  function handleLogoClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (isLandingPath()) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
   }
 
@@ -18,11 +32,8 @@ export function Header() {
     >
       <div className={`${SITE_MAX} mx-auto ${SITE_PX} flex h-full items-center justify-between`}>
         <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          href="/"
+          onClick={handleLogoClick}
           className="flex items-center gap-2.5 no-underline"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-[9px]" style={{ background: P }}>
@@ -35,7 +46,7 @@ export function Header() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
-              href={item.href}
+              href={buildSectionHref(item.href)}
               onClick={(e) => handleNavClick(e, item.href)}
               className="text-[14px] font-medium text-[#6e6e73] no-underline transition-colors hover:text-[#0a0a0a]"
             >

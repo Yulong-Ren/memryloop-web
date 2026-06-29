@@ -1,11 +1,13 @@
-import { NAV_ITEMS, scrollToSection } from '../config';
+import { buildSectionHref, NAV_ITEMS, navigateToSection } from '../config';
 import { P, SITE_MAX, SITE_PX } from '../design/tokens';
 import { SparklesIcon } from './icons';
 
 export function Footer() {
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-    e.preventDefault();
-    scrollToSection(href.slice(1));
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      navigateToSection(href);
+    }
   }
 
   return (
@@ -22,13 +24,19 @@ export function Footer() {
           {NAV_ITEMS.map((link) => (
             <a
               key={link.href}
-              href={link.href}
+              href={buildSectionHref(link.href)}
               onClick={(e) => handleClick(e, link.href)}
               className="text-[13px] text-[#6e6e73] no-underline transition-colors hover:text-[#0a0a0a]"
             >
               {link.label}
             </a>
           ))}
+          <a
+            href="/privacy"
+            className="text-[13px] text-[#6e6e73] no-underline transition-colors hover:text-[#0a0a0a]"
+          >
+            Privacy
+          </a>
         </div>
 
         <div className="text-left md:text-right">

@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { scrollToHashOnLoad } from './config';
 import { CtaSection } from './components/sections/CtaSection';
 import { FeaturesSection } from './components/sections/FeaturesSection';
 import { FeedbackSection } from './components/sections/FeedbackSection';
@@ -11,8 +13,13 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { BillingPage } from './pages/BillingPage';
 import { BillingCancelPage } from './pages/BillingCancelPage';
 import { BillingSuccessPage } from './pages/BillingSuccessPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 
 export function LandingPage() {
+  useEffect(() => {
+    scrollToHashOnLoad();
+  }, []);
+
   return (
     <div className="bg-white">
       <Header />
@@ -47,6 +54,7 @@ function normalizePath(pathname: string): string {
   return trimmed || '/';
 }
 
+// Client routes are also listed in `seo/site-routes.ts` for sitemap generation.
 export function App() {
   const path = normalizePath(window.location.pathname);
 
@@ -64,6 +72,10 @@ export function App() {
 
   if (path === '/billing/cancel') {
     return <BillingCancelPage />;
+  }
+
+  if (path === '/privacy') {
+    return <PrivacyPage />;
   }
 
   return <LandingPage />;

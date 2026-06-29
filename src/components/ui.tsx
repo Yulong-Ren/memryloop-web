@@ -39,8 +39,16 @@ export function Btn({
   const classes = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
 
   if (href) {
+    const isExternal = href.startsWith('http://') || href.startsWith('https://');
     return (
-      <a href={href} className={classes} onClick={onClick} style={variant === 'primary' ? { background: P } : undefined}>
+      <a
+        href={href}
+        className={classes}
+        onClick={onClick}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        style={variant === 'primary' ? { background: P } : undefined}
+      >
         {children}
       </a>
     );

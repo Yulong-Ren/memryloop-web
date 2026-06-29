@@ -1,6 +1,18 @@
-import type { CreateSubscriptionResult, EntitlementStatus } from '../types/billing';
+import type { CreateSubscriptionResult, EntitlementStatus, PlanLimits } from '../types/billing';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+function resolveApiBase(): string {
+  const configured = import.meta.env.VITE_API_BASE_URL?.trim();
+  if (configured) return configured;
+
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  return 'https://api.memryloop.com';
+}
+
+const API_BASE = resolveApiBase();
+const CONFIG_PATH = '/api/billing/config';
 const SUBSCRIPTIONS_PATH = '/api/billing/subscriptions';
 const SYNC_PATH = '/api/billing/subscriptions/sync';
 const STATUS_PATH = '/api/billing/status';
@@ -20,6 +32,21 @@ async function parseJson<T>(response: Response): Promise<T> {
     throw new Error(message);
   }
   return (await response.json()) as T;
+}
+
+export async function fetchBillingConfig(signal?: AbortSignal): Promise<{
+  limits: PlanLimits;
+  proFeatures: string[];
+}> {
+  const response = await fetch(`${API_BASE}${CONFIG_PATH}`, { signal });
+  const config = await parseJson<{
+    limits: PlanLimits;
+    plans: Array<{ features: string[] }>;
+  }>(response);
+  return {
+    limits: config.limits,
+    proFeatures: config.plans[0]?.features ?? [],
+  };
 }
 
 export async function createSubscription(
