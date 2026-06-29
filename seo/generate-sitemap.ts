@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildAbsoluteUrl, getSitemapRoutes, SITE_ORIGIN } from './site-routes';
+import { buildAbsoluteUrl, getSitemapRoutes, SITE_ORIGIN, SITE_ROUTES } from './site-routes';
 
 const SITEMAP_NAMESPACE = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 
@@ -47,11 +47,31 @@ export function generateRobotsTxt(): string {
   return [`User-agent: *`, `Allow: /`, ``, `Sitemap: ${SITE_ORIGIN}/sitemap.xml`, ''].join('\n');
 }
 
-/** Cloudflare Pages SPA: copy index.html → 404.html so /billing, /privacy keep their URL. */
-export function writeSpaFallback(outDir: string): void {
+/** Cloudflare Pages: emit route shells so /billing and /privacy resolve to real HTML files. */
+export function writeSpaRouteShells(outDir: string): void {
   const resolvedOutDir = resolve(outDir);
   const indexPath = resolve(resolvedOutDir, 'index.html');
+
   copyFileSync(indexPath, resolve(resolvedOutDir, '404.html'));
+
+  for (const route of SITE_ROUTES) {
+    if (route.path === '/') {
+      continue;
+    }
+
+    const relativePath = route.path.replace(/^\//, '');
+    const routeDir = resolve(resolvedOutDir, relativePath);
+    mkdirSync(routeDir, { recursive: true });
+    copyFileSync(indexPath, resolve(routeDir, 'index.html'));
+  }
+}
+
+function writeTrailingSlashRedirects(outDir: string): void {
+  const lines = SITE_ROUTES.filter((route) => route.path !== '/').map(
+    (route) => `${route.path}  ${route.path}/  308`,
+  );
+
+  writeFileSync(resolve(outDir, '_redirects'), `${lines.join('\n')}\n`, 'utf8');
 }
 
 export function writeSeoArtifacts(outDir: string, lastModified: Date = new Date()): void {
@@ -60,7 +80,8 @@ export function writeSeoArtifacts(outDir: string, lastModified: Date = new Date(
 
   writeFileSync(resolve(resolvedOutDir, 'sitemap.xml'), generateSitemapXml(lastModified), 'utf8');
   writeFileSync(resolve(resolvedOutDir, 'robots.txt'), generateRobotsTxt(), 'utf8');
-  writeSpaFallback(resolvedOutDir);
+  writeSpaRouteShells(resolvedOutDir);
+  writeTrailingSlashRedirects(resolvedOutDir);
 }
 
 const isDirectExecution =

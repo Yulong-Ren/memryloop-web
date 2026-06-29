@@ -4,7 +4,7 @@
  * When adding a new marketing/legal page:
  * 1. Add an entry here with `includeInSitemap: true`
  * 2. Register the route in `src/App.tsx`
- * 3. Cloudflare Pages serves unknown paths via build output `404.html` (copy of index.html)
+ * 3. Build emits `/<route>/index.html` shells for Cloudflare Pages (see writeSpaRouteShells)
  */
 export const SITE_ORIGIN = 'https://memryloop.com';
 
